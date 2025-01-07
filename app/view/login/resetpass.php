@@ -8,7 +8,7 @@
     <meta name="generator" content="PROMTOS 1.0">
     <title>APP PROMTOS</title>
 
-    <link href="<?php echo URL_PATH; ?>app/assets/bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo URL_PATH. PATH_ASSET; ?>bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
       .bd-placeholder-img {
@@ -65,7 +65,7 @@
 
     
     <!-- Custom styles for this template -->
-    <link href="<?php echo URL_PATH; ?>app/assets/css/sign-in.css" rel="stylesheet">
+    <link href="<?php echo URL_PATH. PATH_ASSET; ?>css/sign-in.css" rel="stylesheet">
   </head>
   <body class="text-center">
     <div class="container">
@@ -116,7 +116,7 @@
       </div>
     </div>
 
-     <script src="<?php echo URL_PATH; ?>app/assets/bootstrap-5.3.0-alpha1-dist/js/bootstrap.bundle.min.js"></script>
+     <script src="<?php echo URL_PATH. PATH_ASSET; ?>bootstrap-5.3.0-alpha1-dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
 <!doctype html>

@@ -9,7 +9,7 @@
 
 <div id="divLoading">
 	<div>
-		<img src="<?php echo URL_PATH; ?>app/assets/img/loading.svg" alt="Loading">
+		<img src="<?php echo URL_PATH. PATH_ASSET; ?>img/loading.svg" alt="Loading">
 	</div>
 </div>
 

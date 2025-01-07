@@ -11,6 +11,7 @@ if (isset($_SESSION['user'])) {
 								Panel
 							</a>
 						</li>
+						<hr>
 						<?php if ((calcularpermisos(1, $_SESSION['user']['MatrizPermisos'])["read"])) { ?>
 							<li class="nav-item">
 								<a class="nav-link <?php echo (isset($use_method)) ? (($use_method == 'Tenant') ? ' active' : null) : null; ?>" href="<?php echo URL_PATH . "tenant"; ?>">
@@ -19,19 +20,20 @@ if (isset($_SESSION['user'])) {
 								</a>
 							</li>
 						<?php } ?>
+						<?php if ((calcularpermisos(3, $_SESSION['user']['MatrizPermisos'])["read"])) { ?>
+							<li class="nav-item">
+								<a class="nav-link <?php echo (isset($use_method)) ? (($use_method == 'Clientes') ? ' active' : null) : null; ?>"
+									href="<?php echo URL_PATH . "clientes"; ?>">
+									<i class="bi bi-person-lines-fill"></i>
+									Clientes
+								</a>
+							</li>
+						<?php } ?>
 						<?php if ((calcularpermisos(4, $_SESSION['user']['MatrizPermisos'])["read"])) { ?>
 							<li class="nav-item">
 								<a class="nav-link <?php echo (isset($use_method)) ? (($use_method == 'Productos') ? ' active' : null) : null; ?>" href="<?php echo URL_PATH . "productos"; ?>">
 									<i class="bi bi-upc-scan align-text-bottom"></i>
 									Productos
-								</a>
-							</li>
-						<?php } ?>
-						<?php if ((calcularpermisos(3, $_SESSION['user']['MatrizPermisos'])["read"])) { ?>
-							<li class="nav-item">
-								<a class="nav-link <?php echo (isset($use_method)) ? (($use_method == 'Clientes') ? ' active' : null) : null; ?>" href="<?php echo URL_PATH . "clientes"; ?>">
-									<i class="bi bi-person-lines-fill"></i>
-									Clientes
 								</a>
 							</li>
 						<?php } ?>

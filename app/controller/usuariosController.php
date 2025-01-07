@@ -41,7 +41,7 @@ class UsuariosController
     $method = get_class($this);
     $name_method = explode("Controller", $method);
     $use_method = (isset($name_method[0]) ? $name_method[0] : null);
-    //$carga_function = "function_user.js";
+    //$carga_function = "function_new_user.js";
     $content_view = "user/index.php";
     require_once("app/view/template/template.php");
   }
@@ -63,7 +63,6 @@ class UsuariosController
         $array_xuser = array();
         $badge_perfiles = "";
 
-        $nameUser="\"".($value->NombreCompletoUsuario)."\"";
         $idUser_encrypt=urlencode(openssl_encrypt($value->IDUser, METHODENCRIPT, KEY));
 
           if ($value->CantPerfiles > 0) {
@@ -81,9 +80,10 @@ class UsuariosController
 				if ($value->IDUser == openssl_decrypt($_SESSION["user"]["IDUser"], METHODENCRIPT, KEY)) {
 					$boton_editar = '<i class="bi bi-hand-index-fill"></i> (Yo)';
 				}else{
+						$data_json = json_encode(array("nameUser"=>$value->NombreCompletoUsuario,"idUser_encrypt"=>$idUser_encrypt,"tecnico"=> $tecnico));
 						$boton_editar = "<div class='d-grid gap-2 d-md-block btn-group'>
-                  <button type='button' class='btn btn-warning btn-sm me-2 btn_change_pass' id='changepassuser' name='changepassuser'  data-bs-toggle='modal' data-bs-target='#modal_changepassuser' onclick='prepare_changepassuser(" . $nameUser . "," . $idUser_encrypt . ")'><i class='bi bi-key'></i></button>
-                  <a class='btn btn-outline-dark btn-sm' href='".URL_PATH. "usuarios/nuevousuario/?TKU=". $idUser_encrypt."'> <i class='bi bi-pencil'></i> Editar</a>
+                  <button type='button' class='btn btn-warning btn-sm me-2 btn_change_pass' id='changepassuser' name='changepassuser'  data-bs-toggle='modal' data-bs-target='#modal_changepassuser' onclick='prepare_changepassuser(". $data_json.")'><i class='bi bi-key'></i></button>
+                  <a class='btn btn-outline-dark btn-sm' href='".URL_PATH. "usuarios/nuevousuario/?TKU=". $idUser_encrypt."&tecnico=".$tecnico."'> <i class='bi bi-pencil'></i> Editar</a>
               </div>";
 				}
 
@@ -119,9 +119,11 @@ class UsuariosController
 
   function add_newuser()
   {
+
 		if($_POST){
 
 			$D10S = $_SESSION['user']['D10S'];
+			$newuser_token = isset($_GET['TKU']) ? openssl_decrypt(rawurldecode($_GET['TKU']), METHODENCRIPT, KEY) : null;
 
 			$array_response = array();
 			$newuser_nombre = isset($_POST["newuser_nombre"]) ? strip_tags(trim($_POST["newuser_nombre"])) : null;
@@ -131,7 +133,7 @@ class UsuariosController
 			
 			$newuser_status = isset($_POST["newuser_status"]) ? 1 : 0;
 			$newuser_profile = isset($_POST["newuser_profile"]) ? (($_POST["newuser_profile"])) : null;
-			$newuser_token = isset($_POST["newuser_token"]) ? (strip_tags(trim($_POST["newuser_token"]))) : null;
+			// $newuser_token = isset($_POST["newuser_token"]) ? (strip_tags(trim($_POST["newuser_token"]))) : null;
 			$input_tecnico = isset($_POST["input_tecnico"]) ? (strip_tags(trim($_POST["input_tecnico"]))) : null;
 			$newuser_color = isset($_POST["newuser_color"]) ? (strip_tags(trim($_POST["newuser_color"]))) : null;
 			$newuser_nombrecorto = isset($_POST["newuser_nombrecorto"]) ? (strip_tags(trim($_POST["newuser_nombrecorto"]))) : null;
@@ -148,10 +150,11 @@ class UsuariosController
 			if (!$campos_llenos) {
 				$array_response = array("status" => false, "type" => "warning", "title" => "Error", "msg" => 'Se debe llenar toda la informacion solicitada en el formulario.  <p>Por favor intentelo de nuevo!</p>');
 			} else {
-				$search_token_user = $this->instmodeluser->findemailuser($newuser_email);
-				if ($search_token_user->findemailuser && !$newuser_token) { // Si existe el correo, pero no trae el flag de edicion
-					$array_response = array("status" => false, "type" => "warning", "title" => "Error!", "msg" => "Ya se encuentra registrado un usuario con ese correo electrónico. <br> Intente de nuevo por favor");
-				} elseif (!$search_token_user->findemailuser && !$newuser_token) { // No existe el correo enviado y el flag de edicion tampoco lo trae - Usuario nuevo.
+				$search_token_user = $this->instmodeluser->finduserxID($newuser_token);
+				$finduserxemail=$this->instmodeluser->findemailuser($newuser_email);
+				if (!$search_token_user->IDUser && !$newuser_token && $finduserxemail->findemailuser) { // Si no existe el usuario, pero no trae el flag de edicion y el correo existe
+						$array_response = array("status" => false, "type" => "warning", "title" => "Error!", "msg" => "Ya se encuentra registrado un usuario con ese correo electrónico. <br> Intente de nuevo por favor");
+				} elseif (!$search_token_user->IDUser && !$newuser_token && !$finduserxemail->findemailuser) { // No existe el usuario enviado y el flag de edicion tampoco y el correo tampoco - Usuario nuevo.
 
 					$pass_encrypt = password_hash($newuser_pass, PASSWORD_DEFAULT);
 					$IDUsuarioCreacion = openssl_decrypt($_SESSION['user']['IDUser'], METHODENCRIPT, KEY);
@@ -176,12 +179,11 @@ class UsuariosController
 					} else {
 						$array_response = array("status" => false, "type" => "danger", "title" => "Error!", "msg" => "Hubo un error, no fue posible agregar el usuario nuevo.<br> Comuniquese con soporte.");
 					}
-				} elseif ($search_token_user->findemailuser && $newuser_token) { //Existe el correo enviado y trae el flag de edicion - Edicion de usuario
+				} elseif ($search_token_user->IDUser && $newuser_token) { //Existe el usuario enviado y trae el flag de edicion - Edicion de usuario
 					$edit_usuario = $this->instmodeluser->edit_user($newuser_token, $newuser_nombre, $newuser_apellido, $newuser_status, $newuser_email);
 					if ($edit_usuario) {
-						$buscar_perfiles_db = $this->instmodelperfiles->buscar_perfiles_asignadosxusuario($search_token_user[0]->IDUser);
+						$buscar_perfiles_db = $this->instmodelperfiles->buscar_perfiles_asignadosxusuario($newuser_token);
 
-						$IDtenantActual = ($search_token_user[0]->IDTenant) ? $search_token_user[0]->IDTenant : 0;
 						$buscar_perfiles_db_IDPerfil = array_column($buscar_perfiles_db, "IDPerfil");
 
 						$aAgregar = ($newuser_profile) ? array_diff($newuser_profile, $buscar_perfiles_db_IDPerfil) : false;
@@ -189,13 +191,13 @@ class UsuariosController
 						//Agrega los nuevos perfiles asignados al usuario
 						if ($aAgregar) {
 							foreach ($aAgregar as $key => $value) {
-								$insertar_perfil = $this->instmodelperfiles->asignar_profile_user($search_token_user[0]->IDUser, $value);
+								$insertar_perfil = $this->instmodelperfiles->asignar_profile_user($newuser_token, $value);
 							}
 						}
 						//Retira los perfiles que se le quitaron al usuario
 						if ($aEliminar) {
 							foreach ($aEliminar as $key2 => $value2) {
-								$retirar_perfil = $this->instmodelperfiles->retirar_perfiles_ausuario($search_token_user[0]->IDUser, $value2);
+								$retirar_perfil = $this->instmodelperfiles->retirar_perfiles_ausuario($search_token_user->IDUser, $value2);
 							}
 						}
 						$array_response = array("status" => true, "type" => "success", "title" => "Correcto!", "msg" => "El usuario fue editado correctamente.");
@@ -211,6 +213,7 @@ class UsuariosController
 			$array_response = array("status" => false, "type" => "danger", "title" => "Error!", "msg" => "No es posible ingresar en esta sección.<br> Comuniquese con soporte.");
 		}
 		$_SESSION['msg']=$array_response;
+// var_dump($_SESSION['msg']);
 		header("Location:".URL_PATH. "usuarios".(($input_tecnico)? "\/?tecnico=true":""),true,301);
   }
 
@@ -220,21 +223,22 @@ class UsuariosController
 
   function changepass_user()
   {
-    $newpass = $_POST["newpass"];
-    $IDUser = $_POST["IDUser"];
+    $newpass = $_POST["changepass_user"];
+    $IDUser = isset($_GET['TKU']) ? openssl_decrypt(rawurldecode($_GET['TKU']), METHODENCRIPT, KEY) : null;
+    $tecnico = isset($_GET['tecnico']) ? $_GET['tecnico'] : null;
 
     if ($newpass == "" || $IDUser == "") {
       $array_response = array("status" => false, "type" => "danger", "title" => "Error!", "msg" => "Los datos no pueden estar vacios.  Por favor validar.<br> Comuniquese con soporte.");
     } else {
       $pass_encrypt = password_hash($newpass, PASSWORD_DEFAULT);
-      $change_passuser = $this->instmodeluser->change_passuser($pass_encrypt, openssl_decrypt($IDUser, METHODENCRIPT, KEY));
+      $change_passuser = $this->instmodeluser->change_passuser($pass_encrypt, $IDUser);
       if ($change_passuser) {
         $array_response = array("status" => true, "type" => "success", "title" => "Correcto!", "msg" => "Se realizo cambio de contraseña del usuario.");
       } else {
         $array_response = array("status" => false, "type" => "danger", "title" => "Error!", "msg" => "Hubo un error, no fue posible cambiar la contraseña del usuario.<br> Comuniquese con soporte.");
       }
     }
-    echo json_encode($array_response);
+		header("Location:" . URL_PATH . "usuarios/index" . (($tecnico) ? "\/?tecnico=true" : ""), true, 301);
   }
 
   function findemail()
@@ -307,13 +311,13 @@ class UsuariosController
 		}
 	
 		$tecnico = (isset($_GET["tecnico"])) ? (($_GET["tecnico"]==true)?1:0) : 0;
-		$newuser_token= isset($_GET['TKU']) ? openssl_decrypt(($_GET['TKU']), METHODENCRIPT, KEY):0;
+		$newuser_token= isset($_GET['TKU']) ? openssl_decrypt($_GET['TKU'], METHODENCRIPT, KEY):0;
 		$lista_perfiles_disponibles = $this->instmodelperfiles->listar_perfiles_permitidos($_SESSION['user']['D10S'],0);
 		$D10S=($_SESSION['user']['D10S']) ? openssl_decrypt($_SESSION['user']['D10S'], METHODENCRIPT, KEY) : 0;
 
 		if($newuser_token){
 			$result_user=$this->instmodeluser->list_user($newuser_token, null, null, $D10S, $tecnico);
-			$array_perfiles= ($result_user[0]->perfiles_asignados)?explode(",",$result_user[0]->perfiles_asignados):null;
+			$array_perfiles= isset($result_user[0]->perfiles_asignados)?explode(",",$result_user[0]->perfiles_asignados):null;
 				$data_user=array(
 					"IDUser"=>openssl_encrypt($result_user[0]->IDUser, METHODENCRIPT, KEY),
 					"TokenUser"=>$result_user[0]->TokenUser,

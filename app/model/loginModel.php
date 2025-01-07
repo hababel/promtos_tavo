@@ -45,7 +45,7 @@ class LoginModel
                 tu.TokenUser,
                 tu.EmailUsuario,
                 CONCAT(tu.NombreUsuario,' ',tu.`ApellidosUsuario`) AS NameUser,
-                tu.EstadoUsuario,
+                tu.EstadoUsuario
               FROM tbl_User tu 
               WHERE tu.EmailUsuario=?;";
 		$stm = $this->pdo->prepare($sql);

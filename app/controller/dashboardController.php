@@ -17,7 +17,7 @@ class DashboardController
 	{
 
 		if (!isset($_SESSION['user'])) {
-			if (!$_SESSION['user']['ConAcceso']) {
+			if (!$_SESSION['user']) {
 				header("Location:" . URL_PATH . "/error/sintenant", true, 301);
 				exit();
 			}

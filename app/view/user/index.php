@@ -99,43 +99,180 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnclose_modalchangepass"></button>
 			</div>
 			<div class="modal-body">
-				<div class="container-fluid">
-					<div id="alert_model_changepassuser"></div>
-					<div class="mb-3">
-						<label for="changepass_user" class="form-label">Nueva contraseña<span style="color:red">*</span></label>
-						<div class="input-group mb-3">
-							<input type="password" class="form-control form-control-sm" name="changepass_user" id="changepass_user" aria-describedby="changepass_user" autocomplete="off" required>
+			<form id="form_changepass" action="<?php echo URL_PATH ?>usuarios/add_newuser<?php echo (isset($data_user)?'/?TKU='. rawurlencode($data_user['IDUser']):''); ?>" method="post">
+					<div class="container-fluid">
+						<div id="alert_model_changepassuser"></div>
 
-							<a class="input-group-text text-decoration-none text-black" id="icon_changepass_user" href="#" role="button" onclick="view_pass()">
-								<i class="bi bi-eye-slash-fill"></i>
-							</a>
-							<small id="helpId" id="cumple_check_pass" class="form-text text-muted">
-								<span id="icono_validacion_changepass_user"></span>
-								<span id="mensaje_validacion_changepass_user">Debe contener: entre 6-12 caracteres, letras mayusculas y minusculas (ambas), numeros.</span>
-							</small>
+						<div class="mb-3">
+							<label for="changepass_user" class="form-label">Nueva contraseña<span style="color:red">*</span></label>
+							<div class="input-group mb-3">
+								<input type="password" class="form-control form-control-sm" name="changepass_user" id="changepass_user" aria-describedby="changepass_user" oninput="validatePassword()" autocomplete="off" required>
+								<a class="input-group-text text-decoration-none text-black" id="icon_changepass_user" href="#" role="button" onclick="view_pass()">
+									<i class="bi bi-eye-slash-fill"></i>
+								</a>
+								<small id="helpId" id="cumple_check_pass" class="form-text text-muted">
+									<span id="icono_validacion_changepass_user"></span>
+									<span id="mensaje_validacion_changepass_user">Debe contener: entre 6-12 caracteres, letras mayusculas y minusculas (ambas), numeros.</span>
+								</small>
+							</div>
 						</div>
-					</div>
-					<div class="mb-3">
-						<label for="confirm_changepass_user" class="form-label">Confirme la nueva contraseña<span style="color:red">*</span></label>
-						<div class="input-group mb-3">
-							<input type="password" class="form-control form-control-sm" name="confirm_changepass_user" id="confirm_changepass_user" aria-describedby="confirm_changepass_user" autocomplete="off" required>
-							<a class="input-group-text text-decoration-none text-black" id="icon_confirm_changepass_user" href="#" role="button" onclick="confirm_view_pass()">
-								<i class="bi bi-eye-slash-fill"></i>
-							</a>
-						</div>
+						<div class="mb-3">
+							<label for="confirm_changepass_user" class="form-label">Confirme la nueva contraseña<span style="color:red">*</span></label>
+							<div class="input-group mb-3">
+								<input type="password" class="form-control form-control-sm" name="confirm_changepass_user" id="confirm_changepass_user" aria-describedby="confirm_changepass_user" oninput="validatePassword()" autocomplete="off" required>
+								<a class="input-group-text text-decoration-none text-black" id="icon_confirm_changepass_user" href="#" role="button" onclick="confirm_view_pass()">
+									<i class="bi bi-eye-slash-fill"></i>
+								</a>
+							</div>
 
-						<div class="invalid-feedback">
-							Las contraseñas deben ser iguales. Por favor confirme.
+							<div class="invalid-feedback">
+								Las contraseñas deben ser iguales. Por favor confirme.
+							</div>
+							<div class="valid-feedback">
+								Contraseñas iguales, correcto!
+							</div>
 						</div>
-						<div class="valid-feedback">
-							Contraseñas iguales, muy bien !
+						<div class="mb-3">
+							<ul class="list-group">
+								<li class="list-group-item d-flex justify-content-start align-items-center border-0">
+									<i class="bi bi-x me-2 text-danger" id="length-check"></i>Mas de 6 caracteres
+								</li>
+								<li class="list-group-item d-flex justify-content-start align-items-center border-0">
+                  <i class="bi bi-x me-2 text-danger" id="match-check"></i>Las contraseñas coinciden
+                </li>
+								<li class="list-group-item d-flex justify-content-start align-items-center border-0">
+									<i class="bi bi-x me-2 text-danger" id="uppercase-lowercase-check"></i>Letra mayuscula y letra minuscula
+								</li>
+								<li class="list-group-item d-flex justify-content-start align-items-center border-0">
+									<i class="bi bi-x me-2 text-danger" id="number-check"></i>Numeros
+								</li>
+							</ul>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="modal-footer" id="button_change_pass">
-
-			</div>
+				<div class="modal-footer" id="button_change_pass">
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
+
+<script>
+
+	function validatePassword() {
+		const password = document.getElementById('changepass_user').value;
+		const confirmPassword = document.getElementById('confirm_changepass_user').value;
+
+		// Más de 6 caracteres
+		const lengthCheck = password.length > 6;
+		updateIcon('length-check', lengthCheck);
+
+		// Las contraseñas coinciden
+		const matchCheck = password === confirmPassword;
+		updateIcon('match-check', matchCheck);
+
+		// Letra mayúscula y letra minúscula
+		const uppercaseCheck = /[A-Z]/.test(password);
+		const lowercaseCheck = /[a-z]/.test(password);
+		const upperLowerCheck = uppercaseCheck && lowercaseCheck;
+		updateIcon('uppercase-lowercase-check', upperLowerCheck);
+
+		// Números
+		const numberCheck = /\d/.test(password);
+		updateIcon('number-check', numberCheck);
+
+		// Habilitar o deshabilitar el botón de guardar
+		const allValid = lengthCheck && matchCheck && upperLowerCheck && numberCheck;
+		document.getElementById('save_changepassuser').disabled = !allValid;
+	}
+
+		function updateIcon(elementId, isValid) {
+				const element = document.getElementById(elementId);
+				if (isValid) {
+						element.classList.remove('bi-x', 'text-danger');
+						element.classList.add('bi-circle-fill', 'text-success');
+				} else {
+						element.classList.remove('bi-circle-fill', 'text-success');
+						element.classList.add('bi-x', 'text-danger');
+				}
+		}
+
+	function prepare_changepassuser(DataUser){
+			
+			//let nameuser_changepass=document.getElementById("nameuser_changepass")
+			let change_pass1=document.getElementById("changepass_user")
+			let change_pass2=document.getElementById("confirm_changepass_user")
+			let button_change_pass=document.getElementById("button_change_pass")
+
+					button_change_pass.innerHTML=`
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+							<button type="submit" class="btn btn-primary" id="save_changepassuser" onclick="save_changepassuser('`+DataUser.idUser_encrypt+`',`+DataUser.tecnico+`)" disabled>Guardar</button>`
+
+			nameuser_changepass.innerHTML=DataUser.nameUser
+			change_pass1.value=""
+			change_pass2.value=""
+			document.getElementById("mensaje_validacion_changepass_user").style.color="black"
+			document.getElementById("icono_validacion_changepass_user").innerHTML=" "
+			document.getElementById("confirm_changepass_user").classList.remove("is-invalid","is-valid")
+
+	}
+
+	function view_pass(){
+			
+			var passwordInput = document.getElementById("changepass_user");
+			var icon_changepass_user = document.getElementById("icon_changepass_user");
+
+
+			if (passwordInput.type === "password") {
+					passwordInput.type = "text";
+					icon_changepass_user.innerHTML=""
+					icon_changepass_user.innerHTML="<i class='bi bi-eye-fill'></i>"
+
+			} else {
+					passwordInput.type = "password";
+					icon_changepass_user.innerHTML=""
+					icon_changepass_user.innerHTML="<i class='bi bi-eye-slash-fill'></i>"
+			}
+	}
+
+	function confirm_view_pass(){
+			
+			var confirm_passwordInput = document.getElementById("confirm_changepass_user");
+			var icon_confirm_changepass_user = document.getElementById("icon_confirm_changepass_user");
+
+
+			if (confirm_passwordInput.type === "password") {
+					confirm_passwordInput.type = "text";
+					icon_confirm_changepass_user.innerHTML=""
+					icon_confirm_changepass_user.innerHTML="<i class='bi bi-eye-fill'></i>"
+
+			} else {
+					confirm_passwordInput.type = "password";
+					icon_confirm_changepass_user.innerHTML=""
+					icon_confirm_changepass_user.innerHTML="<i class='bi bi-eye-slash-fill'></i>"
+			}
+	}
+
+	function save_changepassuser(IDUserchange,tecnico){
+
+		var form_changepass=document.getElementById('form_changepass')
+		form_changepass.action = '<?php echo URL_PATH; ?>usuarios/changepass_user/?TKU='+ IDUserchange+'&tecnico='+tecnico;
+
+		let change_pass1=document.getElementById("changepass_user")
+		let change_pass2=document.getElementById("confirm_changepass_user")
+		if((change_pass1.value !== change_pass2.value) || change_pass1.value.length == 0 || change_pass2.value.length == 0 ){
+				let type_alertp="danger"
+				let title_alertp="Error"
+				let text_alertp="Los datos no pueden estar vacios, por favor validelos"
+				let id_modal="modal_changepassuser"
+				let id_alertintomodal="alert_model_changepassuser"
+				show_msn_alert_intromodal(type_alertp,title_alertp,text_alertp,id_modal,id_alertintomodal)
+				change_pass1.value=""
+				change_pass2.value=""
+		}else{
+				divLoading.style.display = "flex";
+				form_changepass.submit();
+		}
+	}
+
+</script>

@@ -64,7 +64,7 @@
 
           <div class="col-sm-12">
             <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
-						<?php if ($_SESSION['user']["ConAcceso"] && $_SESSION['user']["perfiles_Asignados"]){ ?>
+						<?php if ($_SESSION['user']["perfiles_Asignados"]){ ?>
               <button class='btn btn-warning btn-sm' type='button' id='changepassuser' name='changepassuser' data-bs-toggle='modal' data-bs-target='#modal_changepassuser' onclick='prepare_changepassuser()'><i class='bi bi-key'></i> Cambiar contraseña</button>
               <button class="btn btn-primary btn-sm" type="button" id="changeuserprofile" name="changeuserprofile">Guardar cambios</button>
 						<?php } ?>

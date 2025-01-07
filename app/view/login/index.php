@@ -9,8 +9,8 @@
 	<meta name="generator" content="PROMTOS 1.0">
 	<title>APP PROMTOS</title>
 
-	<link href="<?php echo URL_PATH; ?>app/assets/bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="<?php echo URL_PATH; ?>app/assets/css/sign-in.css" rel="stylesheet">
+	<link href="<?php echo URL_PATH. PATH_ASSET; ?>bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="<?php echo URL_PATH. PATH_ASSET; ?>css/sign-in.css" rel="stylesheet">
 
 	<style>
 		footer {
@@ -81,7 +81,7 @@
 		</div>
 	</div>
 
-	<script src="<?php echo URL_PATH; ?>app/assets/bootstrap-5.3.0-alpha1-dist/js/bootstrap.bundle.min.js"></script>
+	<script src="<?php echo URL_PATH. PATH_ASSET; ?>bootstrap-5.3.0-alpha1-dist/js/bootstrap.bundle.min.js"></script>
 
 	<script>
 		document.addEventListener("DOMContentLoaded", function(event) {

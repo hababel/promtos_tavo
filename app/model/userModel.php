@@ -100,8 +100,9 @@ class UserModel
 		}
 	}
 
-	public function edit_user($TokenUser, $NombreUsuario, $ApellidoUsuario, $EstadoUsuario, $newuser_email, $edit_profile = 0)
+	public function edit_user($IDUser, $NombreUsuario, $ApellidoUsuario, $EstadoUsuario, $newuser_email, $edit_profile = 0)
 	{
+
 		try {
 			if ($edit_profile == 1) { // Esta editando usuario desde el perfil del mismo usuario
 				$sql = "UPDATE tbl_User 
@@ -109,18 +110,18 @@ class UserModel
                   NombreUsuario = ?,
                   ApellidosUsuario =?
                 WHERE
-                  TokenUser=?";
-				$param = array($NombreUsuario, $ApellidoUsuario, $TokenUser);
+                  IDUser=?";
+				$param = array($NombreUsuario, $ApellidoUsuario, $IDUser);
 			} else {
 				$sql = "UPDATE tbl_User 
                 SET 
                   NombreUsuario = ?,
                   ApellidosUsuario =?,
-                  EstadoUsuario=?,
+                  EstadoUsuario=$EstadoUsuario,
                   EmailUsuario=?
                 WHERE
-                  TokenUser=?";
-				$param = array($NombreUsuario, $ApellidoUsuario, $EstadoUsuario, $newuser_email, $TokenUser);
+                  IDUser=?";
+				$param = array($NombreUsuario, $ApellidoUsuario, $newuser_email, $IDUser);
 			}
 
 			$stm = $this->pdo->prepare($sql);
@@ -130,11 +131,11 @@ class UserModel
 		}
 	}
 
-	public function finduserxtoken($IDToken)
+	public function finduserxID($IDUser)
 	{
-		$sql = "SELECT";
+		$sql = "SELECT IDUser FROM tbl_User WHERE IDUser=?";
 		$stm = $this->pdo->prepare($sql);
-		$stm->execute(array($IDToken));
+		$stm->execute(array($IDUser));
 
 		return $stm->fetch(PDO::FETCH_OBJ);
 	}
