@@ -17,4 +17,4 @@ jobs:
         server: ${{ secrets.HOST_PRODUCCION }}
         username: ${{ secrets.USERNAME_PRODUCCION }}
         password: ${{ secrets.PASS_PRODUCCION }}
-        server-dir: /
+        server-dir: 
