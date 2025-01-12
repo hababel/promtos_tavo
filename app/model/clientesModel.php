@@ -115,7 +115,7 @@ class ClientesModel
 							,tc.FechaCreacionCliente
 							,tc.LogEstados
             FROM tbl_Cliente tc
-						LEFT JOIN tbl_serviciocab ts ON tc.IDCliente = ts.IDCliente
+						LEFT JOIN tbl_ServicioCAB ts ON tc.IDCliente = ts.IDCliente
 						".(($idcliente)?" WHERE tc.IDCliente=".$idcliente:NULL)."
 						GROUP BY 
 								tc.IDCliente,
